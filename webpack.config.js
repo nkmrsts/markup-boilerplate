@@ -1,4 +1,5 @@
 const HtmlWebPackPlugin = require('html-webpack-plugin')
+const HtmlWebpackInlineSVGPlugin = require('html-webpack-inline-svg-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
@@ -80,7 +81,18 @@ module.exports = (env, argv) => {
           ]
         },
         {
-          test: /\.(jpe?g|png|gif|svg|ico)(\?.+)?$/,
+          test: /\.(svg)(\?.+)?$/,
+          use: [
+            {
+              loader: 'file-loader',
+              options: {
+                name: 'images/svg/[name].[ext]'
+              }
+            }
+          ]
+        },
+        {
+          test: /\.(jpe?g|png|gif|ico)(\?.+)?$/,
           use: [
             {
               loader: 'file-loader',
@@ -112,7 +124,8 @@ module.exports = (env, argv) => {
       new HtmlWebPackPlugin({
         template: './src/index.html',
         filename: './index.html'
-      })
+      }),
+      new HtmlWebpackInlineSVGPlugin()
     ]
   }
 }
