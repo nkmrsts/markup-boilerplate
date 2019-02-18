@@ -1,8 +1,14 @@
 const HtmlWebPackPlugin = require('html-webpack-plugin')
-const HtmlWebpackInlineSVGPlugin = require('html-webpack-inline-svg-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+const CleanWebpackPlugin = require('clean-webpack-plugin')
+
+const ImageminPlugin = require('imagemin-webpack')
+const imageminGifsicle = require('imagemin-gifsicle')
+const imageminMozjpeg = require('imagemin-mozjpeg')
+const imageminOptipng = require('imagemin-optipng')
+const imageminSvgo = require('imagemin-svgo')
 
 module.exports = (env, argv) => {
   const IS_DEVELOPMENT = argv.mode === 'development'
@@ -18,7 +24,8 @@ module.exports = (env, argv) => {
     // ローカル開発用環境
     devServer: {
       contentBase: 'dist',
-      open: true
+      open: true,
+      host: '0.0.0.0'
     },
     module: {
       rules: [
@@ -40,10 +47,17 @@ module.exports = (env, argv) => {
           }
         },
         {
-          test: /\.html$/,
+          test: /\.ejs$/,
           use: [
             {
-              loader: 'html-loader'
+              loader: 'html-loader',
+              options: {
+                attrs: ['img:src', 'img:srcset', 'source:srcset'],
+                interpolate: true
+              }
+            },
+            {
+              loader: 'ejs-html-loader'
             }
           ]
         },
@@ -81,18 +95,18 @@ module.exports = (env, argv) => {
           ]
         },
         {
-          test: /\.(svg)(\?.+)?$/,
+          test: /\.(otf|woff|woff2)(\?.+)?$/,
           use: [
             {
               loader: 'file-loader',
               options: {
-                name: 'images/svg/[name].[ext]'
+                name: 'fonts/[name].[ext]'
               }
             }
           ]
         },
         {
-          test: /\.(jpe?g|png|gif|ico)(\?.+)?$/,
+          test: /\.(jpe?g|png|gif|ico|svg)(\?.+)?$/,
           use: [
             {
               loader: 'file-loader',
@@ -122,10 +136,38 @@ module.exports = (env, argv) => {
         filename: 'style.css'
       }),
       new HtmlWebPackPlugin({
-        template: './src/index.html',
-        filename: './index.html'
+        // template: './src/index.html',
+        filename: './index.html',
+        template: './src/index.ejs'
       }),
-      new HtmlWebpackInlineSVGPlugin()
+      new ImageminPlugin({
+        bail: false, // Ignore errors on corrupted images
+        cache: true,
+        imageminOptions: {
+          // Lossless optimization with custom option
+          // Feel free to experement with options for better result for you
+          plugins: [
+            imageminGifsicle({
+              interlaced: true
+            }),
+            /* imageminJpegtran({
+              progressive: true
+            }), */
+            imageminMozjpeg({
+              quality: 80
+            }),
+            imageminOptipng({
+              optimizationLevel: 5
+            }),
+            imageminSvgo({
+              removeViewBox: true
+            })
+          ]
+        }
+      }),
+      new CleanWebpackPlugin(['dist'], {
+        dry: IS_DEVELOPMENT
+      })
     ]
   }
 }

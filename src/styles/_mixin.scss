@@ -1,0 +1,45 @@
+@mixin mq($breakpoint) {
+	@if map-has-key($breakpoint-map, $breakpoint) {
+		@media #{inspect(map-get($breakpoint-map, $breakpoint))} {
+			@content;
+		}
+	} @else {
+		@warn "Unfortunately, no value could be retrieved from `#{$breakpoint}`. "
+            + "Please make sure it is defined in `$breakpoints` map.";
+	}
+}
+
+// SVGタグをURLエンコード
+@function svg-encode($svg) {
+	// Add missing namespace
+	@if not str-index($svg, ' xmlns="http://www.w3.org/2000/svg"') {
+		$svg: str-insert($svg, ' xmlns="http://www.w3.org/2000/svg"', 5);
+	}
+
+	// Encode characters
+	$encode: (
+		'"': "%22",
+		"#": "%23",
+		"%": "%25",
+		"<": "%3C",
+		">": "%3E",
+		"{": "%7B",
+		"}": "%7D"
+	);
+
+	$string: "";
+	$character: "";
+
+	@for $i from 1 through str-length($svg) {
+		$character: str-slice($svg, $i, $i);
+
+		@if index(map-keys($encode), $character) {
+			$character: map-get($encode, $character);
+		}
+
+		$string: $string + $character;
+	}
+
+	// Return data URI
+	@return url("data:image/svg+xml,#{$string}");
+}

@@ -1,0 +1,33 @@
+// font-color
+
+// font-weight
+// Noto Sans指定時
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-bold: 700;
+$font-weight-black: 900;
+
+// color
+
+// border-radius
+
+// transition
+$ease-out: cubic-bezier(0, 0, 0.2, 1);
+$ease-in: cubic-bezier(0.4, 0, 1, 1);
+$ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+$ease-in-out-sharp: cubic-bezier(0.4, 0, 0.6, 1);
+
+
+// breakpoint
+$breakpoint-sm: 480px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1048px;
+
+$breakpoint-map: (
+	"sm": "screen and (min-width: #{$breakpoint-sm})",
+	"md": "screen and (min-width: #{$breakpoint-md})",
+	"lg": "screen and (min-width: #{$breakpoint-lg})"
+);
+
+// path
+$img-path: "../images/";
